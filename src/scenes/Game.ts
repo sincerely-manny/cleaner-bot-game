@@ -10,6 +10,8 @@ export class Game extends Scene {
     charIsOverlappingPuddle: boolean;
     meteors: Phaser.Physics.Arcade.Image[] = [];
 
+    gameOver = false;
+
     constructor() {
         super('Game');
         this.charIsOverlappingPuddle = false;
@@ -47,6 +49,16 @@ export class Game extends Scene {
             .setFriction(0, 0)
             .setDepth(1);
         this.character.body?.setSize(70, 90).setOffset(65, 80);
+
+        this.tweens.add({
+            targets: this.character,
+            angle: { from: -5, to: 5 },
+            rotation: { from: -0.03, to: 0.03 },
+            duration: 1500,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut',
+        });
 
         this.anims.create({
             key: 'idle',
@@ -174,8 +186,13 @@ export class Game extends Scene {
                 this.character.tint = 0xff0000;
                 this.character.setTint(0xff5555);
                 this.scene.pause();
-                // this.scene.start('GameOver');
+                this.gameOver = true;
             });
         }
+        this.meteors.forEach((meteor) => {
+            if (meteor.body?.position.x && meteor.body.position.x < -100) {
+                meteor.destroy();
+            }
+        });
     }
 }
