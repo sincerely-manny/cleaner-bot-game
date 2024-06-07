@@ -16,7 +16,14 @@
         "strictPropertyInitialization": false,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "noFallthroughCasesInSwitch": true
+        "noFallthroughCasesInSwitch": true,
+        "types": ["svelte"],
+        "typeRoots": ["@types", "./node_modules/@types"],
+        "paths": {
+            "@components/*": ["src/components/*"],
+            "@lib/*": ["src/lib/*"]
+        }
     },
-    "include": ["src"]
+    "include": ["src/**/*", "src/**/*.svelte", "@types/**/*.d.ts"],
+    "exclude": ["node_modules"]
 }
