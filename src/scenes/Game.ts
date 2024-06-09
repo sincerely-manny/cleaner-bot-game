@@ -1,5 +1,6 @@
 import { Scene } from 'phaser';
 import { SCREEN_SIZE } from '../screensize';
+import { reactNativeEvents } from '@lib/events';
 
 export class Game extends Scene {
     ground: Phaser.Physics.Arcade.Image;
@@ -10,14 +11,19 @@ export class Game extends Scene {
     charIsOverlappingPuddle: boolean;
     meteors: Phaser.Physics.Arcade.Image[] = [];
 
+    nativeEvents = reactNativeEvents;
+
     gameOver = false;
 
     constructor() {
         super('Game');
         this.charIsOverlappingPuddle = false;
+        this.nativeEvents.redirectLogs();
+        this.nativeEvents.listen();
     }
 
     create() {
+        this.scene.pause();
         this.add
             .image(SCREEN_SIZE.width / 2, SCREEN_SIZE.height / 2, 'background')
             .setScale(0.75);

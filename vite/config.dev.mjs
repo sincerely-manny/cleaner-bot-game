@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import path from 'path';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
     base: './',
@@ -13,11 +14,12 @@ export default defineConfig({
         },
     },
     server: {
-        port: 8080,
+        port: 3000,
     },
     resolve: {
         alias: {
             '@': path.resolve(__dirname, 'src'),
         },
     },
+    plugins: [tsconfigPaths()],
 });
