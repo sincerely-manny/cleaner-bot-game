@@ -1,7 +1,6 @@
 import eslint from '@eslint/js';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
-import eslintPluginSvelte from 'eslint-plugin-svelte';
 
 export default [
     {
@@ -10,7 +9,7 @@ export default [
         ...eslint.configs.recommended,
     },
     {
-        files: ['**/*.ts', '**/*.svelte'],
+        files: ['**/*.ts'],
         languageOptions: {
             parser: tsParser,
             parserOptions: {
@@ -25,7 +24,6 @@ export default [
             ...tseslint.configs.recommended.rules,
             ...tseslint.configs.stylistic.rules,
             ...tseslint.configs['strict-type-checked'].rules,
-            ...eslintPluginSvelte.configs['flat/recommended'],
         },
     },
 ];
