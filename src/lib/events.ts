@@ -14,7 +14,10 @@ export type Message =
       }
     | {
           type: 'set-score';
-          payload: number;
+          payload: {
+              coins: number;
+              medals: number;
+          };
       };
 
 export const reactNativeEvents = {

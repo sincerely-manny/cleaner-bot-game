@@ -12,7 +12,8 @@ export class Game extends Scene {
     puddle?: Phaser.Physics.Arcade.Image;
     charIsOverlappingPuddle: boolean;
     meteors: Phaser.Physics.Arcade.Image[] = [];
-    score = 0;
+    _coins = 0;
+    _medals = 0;
 
     nativeEvents = reactNativeEvents;
 
@@ -44,10 +45,6 @@ export class Game extends Scene {
                 }
                 if (msg.payload === 'restart') {
                     this.scene.restart();
-                    this.nativeEvents.send({
-                        type: 'declare-state',
-                        payload: 'play',
-                    });
                 }
                 break;
         }
@@ -148,6 +145,13 @@ export class Game extends Scene {
         this.cursors?.space.on('up', () => {
             this.goDown();
         });
+
+        this.coins = 0;
+        this.medals = 0;
+        this.nativeEvents.send({
+            type: 'declare-state',
+            payload: 'play',
+        });
     }
 
     goUp() {
@@ -160,6 +164,8 @@ export class Game extends Scene {
     }
 
     update() {
+        this.medals += 0.01;
+
         const currentVelocity = this.character.body?.velocity.y;
 
         if (currentVelocity && currentVelocity < -100) {
@@ -228,11 +234,7 @@ export class Game extends Scene {
                             },
                         });
 
-                        this.score += 1;
-                        this.nativeEvents.send({
-                            type: 'set-score',
-                            payload: this.score,
-                        });
+                        this.coins++;
                     }
                 });
             }
@@ -274,6 +276,34 @@ export class Game extends Scene {
             if (meteor.body?.position.x && meteor.body.position.x < -100) {
                 meteor.destroy();
             }
+        });
+    }
+
+    set coins(value: number) {
+        this._coins = value;
+        this.sendScore();
+    }
+
+    get coins() {
+        return this._coins;
+    }
+
+    set medals(value: number) {
+        this._medals = value;
+        this.sendScore();
+    }
+
+    get medals() {
+        return this._medals;
+    }
+
+    sendScore() {
+        this.nativeEvents.send({
+            type: 'set-score',
+            payload: {
+                coins: Math.round(this.coins),
+                medals: Math.round(this.medals),
+            },
         });
     }
 }
