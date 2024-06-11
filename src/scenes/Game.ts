@@ -1,15 +1,18 @@
 import { Scene } from 'phaser';
 import { SCREEN_SIZE } from '../screensize';
-import { reactNativeEvents } from '@lib/events';
+import { Message, reactNativeEvents } from '@lib/events';
 
 export class Game extends Scene {
     ground: Phaser.Physics.Arcade.Image;
     character: Phaser.Physics.Arcade.Sprite;
+    coin: Phaser.Physics.Arcade.Image;
+    coinText: Phaser.GameObjects.Text;
     cursors?: Phaser.Types.Input.Keyboard.CursorKeys;
     touch?: Phaser.Input.Pointer;
     puddle?: Phaser.Physics.Arcade.Image;
     charIsOverlappingPuddle: boolean;
     meteors: Phaser.Physics.Arcade.Image[] = [];
+    score = 0;
 
     nativeEvents = reactNativeEvents;
 
@@ -19,11 +22,38 @@ export class Game extends Scene {
         super('Game');
         this.charIsOverlappingPuddle = false;
         this.nativeEvents.redirectLogs();
-        this.nativeEvents.listen();
+        this.nativeEvents.listen(this.nativeEnentCallback);
     }
 
+    nativeEnentCallback = (msg: Message) => {
+        switch (msg.type) {
+            case 'set-state':
+                if (msg.payload === 'play') {
+                    this.scene.resume();
+                    this.nativeEvents.send({
+                        type: 'declare-state',
+                        payload: 'play',
+                    });
+                }
+                if (msg.payload === 'pause') {
+                    this.scene.pause();
+                    this.nativeEvents.send({
+                        type: 'declare-state',
+                        payload: 'pause',
+                    });
+                }
+                if (msg.payload === 'restart') {
+                    this.scene.restart();
+                    this.nativeEvents.send({
+                        type: 'declare-state',
+                        payload: 'play',
+                    });
+                }
+                break;
+        }
+    };
+
     create() {
-        this.scene.pause();
         this.add
             .image(SCREEN_SIZE.width / 2, SCREEN_SIZE.height / 2, 'background')
             .setScale(0.75);
@@ -90,6 +120,17 @@ export class Game extends Scene {
             SCREEN_SIZE.height - 70
         );
         this.character.setCollideWorldBounds(true);
+
+        this.coin = this.physics.add.image(0, 0, 'coin');
+        this.coin.setOrigin(0.5, 0.5);
+        this.coin.visible = false;
+        this.coinText = this.add.text(400, 500, '+1', {
+            fontSize: '22px',
+            color: '#ffffff',
+            fontFamily: 'SF Pro Display Semibold',
+        });
+        this.coinText.setOrigin(1, 0.5);
+        this.coinText.visible = false;
 
         this.cursors = this.input.keyboard?.createCursorKeys();
         this.touch = this.input.pointer1;
@@ -162,6 +203,36 @@ export class Game extends Scene {
                             duration: 500,
                             repeat: 0,
                         });
+
+                        this.coin.visible = true;
+                        this.coin.setPosition(
+                            this.character.x,
+                            this.character.y - 70
+                        );
+                        this.coinText.visible = true;
+                        this.coinText.setPosition(
+                            this.coin.x - 18,
+                            this.coin.y
+                        );
+                        this.tweens.add({
+                            targets: [this.coin, this.coinText],
+                            y: '-=200',
+                            alpha: 0.5,
+                            duration: 2000,
+                            ease: 'Power2',
+                            onComplete: () => {
+                                this.coin.visible = false;
+                                this.coinText.visible = false;
+                                this.coin.setAlpha(1);
+                                this.coinText.setAlpha(1);
+                            },
+                        });
+
+                        this.score += 1;
+                        this.nativeEvents.send({
+                            type: 'set-score',
+                            payload: this.score,
+                        });
                     }
                 });
             }
@@ -193,6 +264,10 @@ export class Game extends Scene {
                 this.character.setTint(0xff5555);
                 this.scene.pause();
                 this.gameOver = true;
+                this.nativeEvents.send({
+                    type: 'declare-state',
+                    payload: 'game-over',
+                });
             });
         }
         this.meteors.forEach((meteor) => {

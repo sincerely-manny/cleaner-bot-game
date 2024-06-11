@@ -1,8 +1,19 @@
+@font-face {
+    font-family: 'SF Pro Display Semibold';
+    src: url('./assets/SF-Pro-Display-Semibold.otf') format('opentype');
+    font-weight: 600;
+    font-weight: 'semibold';
+    font-style: normal;
+}
+
 body {
     margin: 0;
     padding: 0;
     color: rgba(255, 255, 255, 0.87);
     background-color: #000000;
+    font-family: 'SF Pro Display Semibold', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
 }
 
 #app {

@@ -16,6 +16,7 @@ export class Preload extends Scene {
             frameHeight: 200,
         });
         this.load.svg('puddle', 'puddle.svg');
+        this.load.svg('coin', 'coin.svg');
     }
 
     create() {

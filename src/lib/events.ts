@@ -1,14 +1,20 @@
-type Message =
-    | {
-          type: string;
-          payload: string;
-      }
+type GameState = 'play' | 'pause' | 'restart' | 'game-over' | 'win';
+
+export type Message =
     | {
           type: 'log';
           payload: {
               level: 'log' | 'error' | 'warn' | 'info';
               message: string;
           };
+      }
+    | {
+          type: 'set-state' | 'declare-state';
+          payload: GameState;
+      }
+    | {
+          type: 'set-score';
+          payload: number;
       };
 
 export const reactNativeEvents = {
